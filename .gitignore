@@ -1,15 +1,6 @@
-# Distribution
-dist
-out
+.env
+.vscode
+coverage.html
+coverage.out
 build
-node_modules
-
-# Logs
-*.log*
-logs
-
-# Environment
-*.env*
-
-# Misc
-.DS_Store
+**/tmp
