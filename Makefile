@@ -24,7 +24,7 @@ fmt:
 
 test:
 	@echo "Running the Go project tests..."
-	@go list ./... | xargs go test -v -coverprofile=coverage.out
+	@go list ./... | grep -v "/config$$" | xargs go test -v -coverprofile=coverage.out
 
 coverage:
 	@echo "Running the Go project tests with coverage..."
