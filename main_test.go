@@ -1,4 +1,4 @@
-package queue
+package main
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
 	_ "github.com/Real-Dev-Squad/discord-message-broker/tests"
-	"github.com/Real-Dev-Squad/discord-message-broker/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/stretchr/testify/assert"
 )
@@ -57,20 +56,6 @@ func TestInitQueueConnection(t *testing.T) {
 
 	})
 
-}
-
-func TestGetQueueInstance(t *testing.T) {
-	t.Run("Should use ExponentialBackoffRetry via GetQueueInstance", func(t *testing.T) {
-		attempt := 0
-		originalFunc := utils.ExponentialBackoffRetry
-		utils.ExponentialBackoffRetry = func(maxRetries int, operation func() error) error {
-			attempt++
-			return errors.New("error")
-		}
-		defer func() { utils.ExponentialBackoffRetry = originalFunc }()
-		assert.Nil(t, GetQueueInstance())
-		assert.Equal(t, 1, attempt)
-	})
 }
 
 func TestSessionWrapper(t *testing.T) {

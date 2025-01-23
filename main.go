@@ -1,4 +1,4 @@
-package queue
+package main
 
 import (
 	"sync"
@@ -51,7 +51,9 @@ func (q *Queue) consumer() {
 		false,  // no-wait
 		nil,    // args
 	)
-	logrus.Errorf("%s Failed to register a consumer", err)
+	if err != nil {
+		logrus.Errorf("%s Failed to register a consumer", err)
+	}
 
 	//TODO: Implement API with authentication (tracking issue: https://github.com/Real-Dev-Squad/discord-service/issues/28)
 	forever := make(chan bool)
@@ -96,17 +98,12 @@ func InitQueueConnection(openSession sessionInterface) {
 		logrus.Errorf("Failed to initialize queue after %d attempts: %s", config.AppConfig.MAX_RETRIES, err)
 		return
 	}
-	go openSession.consumer()
+	openSession.consumer()
 	logrus.Infof("Established a connection to RabbitMQ named %s", config.AppConfig.QUEUE_NAME)
 
 }
 
-func queueHandler() {
+func main() {
 	queueInstance := &Queue{}
 	InitQueueConnection(queueInstance)
-}
-
-var GetQueueInstance = func() *Queue {
-	once.Do(queueHandler)
-	return queueInstance
 }
