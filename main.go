@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
-	"github.com/Real-Dev-Squad/discord-message-broker/handler"
 	"github.com/Real-Dev-Squad/discord-message-broker/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -56,7 +55,12 @@ func (q *Queue) consumer() {
 
 	//TODO: Implement API with authentication (tracking issue: https://github.com/Real-Dev-Squad/discord-service/issues/28)
 	forever := make(chan bool)
-	go handler.TaskHandler(msgs)
+	go func() {
+		for d := range msgs {
+			logrus.Printf("Received a message: %s", d.Body)
+		}
+	}()
+
 	<-forever
 }
 
