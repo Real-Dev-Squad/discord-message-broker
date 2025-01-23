@@ -11,6 +11,7 @@ import (
 type Config struct {
 	QUEUE_NAME  string
 	MAX_RETRIES int
+	QUEUE_URL   string
 }
 
 var AppConfig Config
@@ -24,6 +25,7 @@ func init() {
 
 	AppConfig = Config{
 		QUEUE_NAME:  loadEnv("QUEUE_NAME"),
+		QUEUE_URL:   loadEnv("QUEUE_URL"),
 		MAX_RETRIES: 5,
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// TODO: Remove this, and use the one from github.com/Real-Dev-Squad/discord-service/utils/helper
 var ExponentialBackoffRetry = func(maxRetries int, operation func() error) error {
 	var err error
 	for i := 0; i < maxRetries; i++ {

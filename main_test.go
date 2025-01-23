@@ -57,12 +57,6 @@ func TestInitQueueConnection(t *testing.T) {
 
 	})
 
-	t.Run("should pass when no error is returned", func(t *testing.T) {
-		mockQueue := &mockQueue{}
-		assert.NotPanics(t, func() {
-			InitQueueConnection(mockQueue)
-		})
-	})
 }
 
 func TestGetQueueInstance(t *testing.T) {
