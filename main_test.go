@@ -17,6 +17,9 @@ type mockQueue struct {
 	queueError   error
 }
 
+func (m *mockQueue) consumer() {
+}
+
 func (m *mockQueue) dial() error {
 	return m.dialError
 }

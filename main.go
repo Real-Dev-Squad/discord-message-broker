@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
+	"github.com/Real-Dev-Squad/discord-message-broker/handler"
 	"github.com/Real-Dev-Squad/discord-message-broker/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -55,11 +56,7 @@ func (q *Queue) consumer() {
 
 	//TODO: Implement API with authentication (tracking issue: https://github.com/Real-Dev-Squad/discord-service/issues/28)
 	forever := make(chan bool)
-	go func() {
-		for d := range msgs {
-			logrus.Printf("Received a message: %s", d.Body)
-		}
-	}()
+	go handler.TaskHandler(msgs)
 	<-forever
 }
 
@@ -72,6 +69,7 @@ type sessionInterface interface {
 	dial() error
 	createChannel() error
 	declareQueue() error
+	consumer()
 }
 
 func InitQueueConnection(openSession sessionInterface) {
@@ -94,7 +92,7 @@ func InitQueueConnection(openSession sessionInterface) {
 		logrus.Errorf("Failed to initialize queue after %d attempts: %s", config.AppConfig.MAX_RETRIES, err)
 		return
 	}
-
+	go openSession.consumer()
 	logrus.Infof("Established a connection to RabbitMQ named %s", config.AppConfig.QUEUE_NAME)
 
 }
