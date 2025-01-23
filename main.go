@@ -53,8 +53,8 @@ func (q *Queue) consumer() {
 	)
 	logrus.Errorf("%s Failed to register a consumer", err)
 
+	//TODO: Implement API with authentication (tracking issue: https://github.com/Real-Dev-Squad/discord-service/issues/28)
 	forever := make(chan bool)
-
 	go func() {
 		for d := range msgs {
 			logrus.Printf("Received a message: %s", d.Body)
