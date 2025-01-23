@@ -33,7 +33,7 @@ Before running the project, ensure that you have the following installed:
 
 1. Ensure Docker is installed and running on your machine.
 2. Navigate to the project directory.
-3. Create a `docker-compose.yml` file with the following content:
+3. Make sure repo contains a `docker-compose.yml` file with the following content:
 
    ```yaml
    version: '3.8'
