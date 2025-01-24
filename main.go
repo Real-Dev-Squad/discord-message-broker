@@ -1,8 +1,6 @@
 package main
 
 import (
-	"sync"
-
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
 	"github.com/Real-Dev-Squad/discord-message-broker/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -38,6 +36,7 @@ func (q *Queue) declareQueue() error {
 		false,                           // no-wait
 		amqp.Table{"x-max-priority": 2}, // arguments
 	)
+	q.Name = config.AppConfig.QUEUE_NAME // Ensure the queue name is set
 	return err
 }
 
@@ -45,7 +44,7 @@ func (q *Queue) consumer() {
 	msgs, err := q.Channel.Consume(
 		q.Name, // queue
 		"",     // consumer
-		true,   // auto-ack
+		false,  // auto-ack
 		false,  // exclusive
 		false,  // no-local
 		false,  // no-wait
@@ -53,23 +52,22 @@ func (q *Queue) consumer() {
 	)
 	if err != nil {
 		logrus.Errorf("%s Failed to register a consumer", err)
+		return
 	}
 
-	//TODO: Implement API with authentication (tracking issue: https://github.com/Real-Dev-Squad/discord-service/issues/28)
 	forever := make(chan bool)
+	//TODO: Implement API (ref : https://github.com/Real-Dev-Squad/discord-message-broker/issues/6)
 	go func() {
+		logrus.Info("Consumer connected")
 		for d := range msgs {
 			logrus.Printf("Received a message: %s", d.Body)
+			d.Ack(false)
 		}
 	}()
 
 	<-forever
+	logrus.Info("Consumer stopped")
 }
-
-var (
-	queueInstance *Queue
-	once          sync.Once
-)
 
 type sessionInterface interface {
 	dial() error
@@ -98,9 +96,8 @@ func InitQueueConnection(openSession sessionInterface) {
 		logrus.Errorf("Failed to initialize queue after %d attempts: %s", config.AppConfig.MAX_RETRIES, err)
 		return
 	}
-	openSession.consumer()
 	logrus.Infof("Established a connection to RabbitMQ named %s", config.AppConfig.QUEUE_NAME)
-
+	openSession.consumer()
 }
 
 func main() {
