@@ -11,6 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type errorReader struct{}
+
+func (e *errorReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("simulated read error")
+}
+
 func TestExponentialBackoffRetry_Success(t *testing.T) {
 	attempts := 0
 	operation := func() error {
@@ -61,71 +67,83 @@ func TestExponentialBackoffRetry_ImmediateSuccess(t *testing.T) {
 	assert.Equal(t, 1, attempts)
 }
 
-func TestMakeAPIRequest_Success(t *testing.T) {
-	// Create a mock server
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello, World!"))
-	}))
-	defer mockServer.Close()
+func TestMakeAPIRequest(t *testing.T) {
+	t.Run("should return nil when successful", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Hello, World!"))
+		}))
+		defer mockServer.Close()
 
-	// Test the MakeAPIRequest function
-	method := "GET"
-	endpoint := mockServer.URL
-	body := []byte{}
+		method := "GET"
+		endpoint := mockServer.URL
+		body := []byte{}
 
-	responseBody, err := MakeAPIRequest(method, endpoint, &body)
-	assert.NoError(t, err)
-	assert.NotNil(t, responseBody)
-	assert.Equal(t, "Hello, World!", string(*responseBody))
-}
+		responseBody, err := MakeAPIRequest(method, endpoint, &body)
+		assert.NoError(t, err)
+		assert.NotNil(t, responseBody)
+		assert.Equal(t, "Hello, World!", string(*responseBody))
+	})
 
-func TestMakeAPIRequest_Failure(t *testing.T) {
-	// Create a mock server that returns an error
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-	}))
-	defer mockServer.Close()
+	t.Run("should return error when status code is not 200", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+		}))
+		defer mockServer.Close()
 
-	// Test the MakeAPIRequest function
-	method := "GET"
-	endpoint := mockServer.URL
-	body := []byte{}
+		method := "GET"
+		endpoint := mockServer.URL
+		body := []byte{}
 
-	responseBody, err := MakeAPIRequest(method, endpoint, &body)
-	assert.Error(t, err)
-	assert.Nil(t, responseBody)
-	assert.Equal(t, "failed to get a successful response from the API", err.Error())
-}
+		responseBody, err := MakeAPIRequest(method, endpoint, &body)
+		assert.Error(t, err)
+		assert.Nil(t, responseBody)
+		assert.Equal(t, "failed to get a successful response from the API", err.Error())
+	})
 
-func TestMakeAPIRequest_Timeout(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(2 * time.Second)
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer mockServer.Close()
+	t.Run("should handle timeouts", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(2 * time.Second)
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer mockServer.Close()
 
-	method := "GET"
-	endpoint := mockServer.URL
-	body := []byte{}
+		method := "GET"
+		endpoint := mockServer.URL
+		responseBody, err := MakeAPIRequest(method, endpoint, nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, responseBody)
+	})
+	t.Run("should return error if unable to make the request", func(t *testing.T) {
+		method := "GET"
+		endpoint := "testing"
+		_, err := MakeAPIRequest(method, endpoint, nil)
+		assert.Error(t, err)
+	})
 
-	responseBody, err := MakeAPIRequest(method, endpoint, &body)
-	assert.NoError(t, err)
-	assert.NotNil(t, responseBody)
 }
 
 func TestSendDataToDiscordService(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Success"))
-	}))
-	defer mockServer.Close()
+	t.Run("should return nil when successful", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Success"))
+		}))
+		defer mockServer.Close()
 
-	config.AppConfig.DISCORD_SERVICE_URL = mockServer.URL
-	config.AppConfig.DISCORD_SERVICE_ENDPOINT = "/test-endpoint"
+		config.AppConfig.DISCORD_SERVICE_URL = mockServer.URL
+		config.AppConfig.DISCORD_SERVICE_ENDPOINT = "/test-endpoint"
 
-	body := []byte(`{"message": "Hello, Discord!"}`)
+		body := []byte(`{"message": "Hello, Discord!"}`)
 
-	err := SendDataToDiscordService(body)
-	assert.NoError(t, err)
+		err := SendDataToDiscordService(body)
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error when unsuccessful", func(t *testing.T) {
+		body := []byte(`{"message": "Hello, Discord!"}`)
+		err := SendDataToDiscordService(body)
+		assert.Error(t, err)
+	})
+
 }
