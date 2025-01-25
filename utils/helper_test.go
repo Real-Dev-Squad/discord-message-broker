@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Real-Dev-Squad/discord-message-broker/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -111,4 +112,20 @@ func TestMakeAPIRequest_Timeout(t *testing.T) {
 	responseBody, err := MakeAPIRequest(method, endpoint, &body)
 	assert.NoError(t, err)
 	assert.NotNil(t, responseBody)
+}
+
+func TestSendDataToDiscordService(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
+	}))
+	defer mockServer.Close()
+
+	config.AppConfig.DISCORD_SERVICE_URL = mockServer.URL
+	config.AppConfig.DISCORD_SERVICE_ENDPOINT = "/test-endpoint"
+
+	body := []byte(`{"message": "Hello, Discord!"}`)
+
+	err := SendDataToDiscordService(body)
+	assert.NoError(t, err)
 }
