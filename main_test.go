@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
+	"github.com/Real-Dev-Squad/discord-message-broker/model"
 	_ "github.com/Real-Dev-Squad/discord-message-broker/tests"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/stretchr/testify/assert"
@@ -16,17 +17,17 @@ type mockQueue struct {
 	queueError   error
 }
 
-func (m *mockQueue) consumer() {
+func (m *mockQueue) Consumer() {
 }
 
-func (m *mockQueue) dial() error {
+func (m *mockQueue) Dial() error {
 	return m.dialError
 }
 
-func (m *mockQueue) createChannel() error {
+func (m *mockQueue) CreateChannel() error {
 	return m.channelError
 }
-func (m *mockQueue) declareQueue() error {
+func (m *mockQueue) DeclareQueue() error {
 	return m.queueError
 }
 
@@ -59,17 +60,17 @@ func TestInitQueueConnection(t *testing.T) {
 }
 
 func TestSessionWrapper(t *testing.T) {
-	sessionWrapper := &Queue{}
+	sessionWrapper := &model.Queue{}
 
 	t.Run("SessionWrapper should always implement dial() method", func(t *testing.T) {
-		err := sessionWrapper.dial()
+		err := sessionWrapper.Dial()
 		assert.Error(t, err)
 	})
 
 	t.Run("SessionWrapper should always implement createChannel() method", func(t *testing.T) {
 		sessionWrapper.Connection = &amqp.Connection{}
 		assert.Panics(t, func() {
-			sessionWrapper.createChannel()
+			sessionWrapper.CreateChannel()
 		})
 
 	})
@@ -77,7 +78,7 @@ func TestSessionWrapper(t *testing.T) {
 	t.Run("SessionWrapper should always implement declareQueue() method", func(t *testing.T) {
 		sessionWrapper.Channel = &amqp.Channel{}
 		assert.Panics(t, func() {
-			sessionWrapper.declareQueue()
+			sessionWrapper.DeclareQueue()
 		})
 	})
 
