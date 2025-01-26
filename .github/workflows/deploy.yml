@@ -52,7 +52,7 @@ jobs:
             docker run -d \
               --name ${{ github.event.repository.name }}-${{vars.ENV}} \
               --network=${{vars.DOCKER_NETWORK}} \
-              -e DISCORD_QUEUE=${{vars.DISCORD_QUEUE}} \
+              -e QUEUE_NAME=${{vars.QUEUE_NAME}} \
               -e QUEUE_URL=${{vars.QUEUE_URL}} \
               -e DISCORD_SERVICE_URL=${{vars.DISCORD_SERVICE_URL}} \
               ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
