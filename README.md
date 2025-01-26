@@ -55,6 +55,21 @@ Before running the project, ensure that you have the following installed:
 
 5. Verify that RabbitMQ is running by accessing the management interface at [http://localhost:15672](http://localhost:15672). The default username and password are both `guest`.
 
+## Setting up Environment Variables
+
+There are total 3 variables required to make this service functional
+
+1. QUEUE_URL (`amqp://<HOST_NAME>:<PORT>`)
+   The value of HOST_NAME depends on how you're running the project.
+
+- If you're using `docker-compose` for both the queue and consumer, and assuming the queue's container is named `rabbitmq`, set `HOST_NAME` to `rabbitmq`.
+- If you're running the consumer without `docker-compose`, then set `HOST_NAME` to `localhost`.
+
+2. QUEUE_NAME
+   You can use any name, consider `RDS_QUEUE` for default use case
+3. DISCORD_SERVICE_URL
+   Place URL of Discord Service
+
 ## Running the Project Using Go
 
 1. **Install Packages**
