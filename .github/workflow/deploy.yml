@@ -5,7 +5,7 @@ on:
     branches:
       - develop
       - main
-      - feat/docker-setup # Remove this before merging to dev
+      - feat/docker-setup # Remove this before merging to dev or after test the deployment
 
 jobs:
   build-and-push:
