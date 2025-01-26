@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
+	"github.com/Real-Dev-Squad/discord-message-broker/utils"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 )
@@ -55,11 +56,11 @@ func (q *Queue) Consumer() {
 	}
 
 	forever := make(chan bool)
-	//TODO: Implement API (ref : https://github.com/Real-Dev-Squad/discord-message-broker/issues/6)
 	go func() {
 		logrus.Info("Consumer connected")
 		for d := range msgs {
 			logrus.Printf("Received a message: %s", d.Body)
+			utils.SendDataToDiscordService(d.Body)
 			d.Ack(false)
 		}
 	}()
