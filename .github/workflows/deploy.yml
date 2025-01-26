@@ -49,7 +49,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
             docker stop ${{ github.event.repository.name }}-${{vars.ENV}} || true
             docker rm ${{ github.event.repository.name }}-${{vars.ENV}} || true
-            docker run -d -p ${{vars.PORT}}:${{vars.PORT}} \
+            docker run -d \
               --name ${{ github.event.repository.name }}-${{vars.ENV}} \
               --network=${{vars.DOCKER_NETWORK}} \
               -e DISCORD_QUEUE=${{vars.DISCORD_QUEUE}} \
