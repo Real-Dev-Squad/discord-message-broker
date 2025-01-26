@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
+	_ "github.com/Real-Dev-Squad/discord-message-broker/tests"
 	"github.com/stretchr/testify/assert"
 )
 

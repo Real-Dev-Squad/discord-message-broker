@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	_ "github.com/Real-Dev-Squad/discord-message-broker/tests"
-
 	"github.com/Real-Dev-Squad/discord-message-broker/config"
 	"github.com/sirupsen/logrus"
 )
