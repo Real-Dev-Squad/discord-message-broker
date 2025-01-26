@@ -1,9 +1,26 @@
-version: '3.8'
-
 services:
+  server:
+    build:
+      context: .
+      target: final
+    container_name: consumer
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+
   rabbitmq:
-    image: rabbitmq:3.13-management
+    image: rabbitmq:4.0.5-management
     container_name: rabbitmq
+    volumes:
+      - './data-rabbitmq:/var/lib/rabbitmq/mnesia/'
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - '5672:5672' # AMQP protocol
+      - '15672:15672' # Management UI (optional)
+
+# volumes:
+#   db-data:
+# secrets:
+#   db-password:
+#     file: db/password.txt
+
