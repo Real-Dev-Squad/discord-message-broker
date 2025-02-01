@@ -126,7 +126,7 @@ You can run the project using the `Makefile`, which provides several commands fo
    make air
    ```
 
-## Other Commands Usage
+## Other Commands In Usage
 
 1. **To run tests**:
 
