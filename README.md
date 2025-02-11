@@ -31,12 +31,18 @@ Before running the project, ensure that you have the following installed:
 
 ## Running Discord Message Broker
 
-### Running both RabbitMQ & Consumer using Docker
+There are 2 ways of running Queue and Consumer,
+
+- either you can setup both with docker if you are not working on consumer
+- but in case if you are working on consumer and want hot reloading, go with running consumer manually
+
+## Way 1: Running both RabbitMQ & Consumer using Docker
 
 Set the following env var(s)
 
 ```
 QUEUE_URL = "amqp://rabbitmq:5672"
+DISCORD_SERVICE_URL = "http://host.docker.internal:<PORT>"
 DISCORD_QUEUE = <ANY_NAME> #Default: "DISCORD_QUEUE"
 ```
 
@@ -46,14 +52,9 @@ Run the compose command:
 docker-compose up --build
 ```
 
+## Way 2: Running RabbitMQ with Docker & Consumer manually
+
 ### Running only RabbitMQ with Docker
-
-Set the following env var(s)
-
-```
-QUEUE_URL = "amqp://localhost:5672"
-DISCORD_QUEUE = <ANY_NAME> #Default: "DISCORD_QUEUE"
-```
 
 ```bash
 docker compose -f 'docker-compose.yml' up -d --build 'rabbitmq'
@@ -63,6 +64,16 @@ docker compose -f 'docker-compose.yml' up -d --build 'rabbitmq'
 > To check if the queue is running or not, visit `http://localhost:5672`
 
 ### Running Consumer Manually
+
+Set the following env var(s)
+
+```
+QUEUE_URL = "amqp://localhost:5672"
+DISCORD_QUEUE = <ANY_NAME> #Default: "DISCORD_QUEUE"
+DISCORD_SERVICE_URL = "http://localhost:<PORT>"
+```
+
+#### Manual Setup
 
 1. **Install Packages**
 
@@ -89,7 +100,7 @@ docker compose -f 'docker-compose.yml' up -d --build 'rabbitmq'
    air
    ```
 
-## Running the Project Using Make
+#### Running the Project Using Make
 
 You can run the project using the `Makefile`, which provides several commands for various tasks. Below are the steps to run the project:
 
