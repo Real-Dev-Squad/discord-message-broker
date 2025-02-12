@@ -61,7 +61,16 @@ docker compose -f 'docker-compose.yml' up -d --build 'rabbitmq'
 ```
 
 > [!IMPORTANT]
-> To check if the queue is running or not, visit `http://localhost:5672`
+> To check if the queue is running or not, visit `http://localhost:15672`
+
+### RabbitMQ UI
+
+This is how the UI will look like once you open `http://localhost:15672`
+
+<img width="1127" alt="Image" src="https://github.com/user-attachments/assets/81b67f52-c762-4773-b75d-26e82d558b36" />
+
+> [!Credentials]
+> User "guest" as username and password
 
 ### Running Consumer Manually
 
