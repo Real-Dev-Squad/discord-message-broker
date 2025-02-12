@@ -18,7 +18,7 @@ Before running the project, ensure that you have the following installed:
 - **Air**: A live-reloading tool for Go that will automatically restart the project on file changes.
 - **Make**: A build automation tool used to manage tasks defined in the `Makefile`.
 
-### Installation
+## Installation
 
 1. **Install Go**
    If you don't have Go installed, follow the official guide to install it:[Go Installation Guide](https://go.dev/doc/install).
@@ -29,54 +29,66 @@ Before running the project, ensure that you have the following installed:
    To install Air, follow the installation steps here:
    [Air Installation Guide](https://github.com/air-verse/air)
 
-## Running RabbitMQ with Docker
+## Running Discord Message Broker
 
-1. Ensure Docker is installed and running on your machine.
-2. Navigate to the project directory.
-3. Make sure repo contains a `docker-compose.yml` file with the following content:
+There are 2 ways of running Queue and Consumer,
 
-   ```yaml
-   version: '3.8'
+- either you can setup both with docker if you are not working on consumer
+- but in case if you are working on consumer and want hot reloading, go with running consumer manually
 
-   services:
-     rabbitmq:
-       image: rabbitmq:3.13-management
-       container_name: rabbitmq
-       ports:
-         - '5672:5672'
-         - '15672:15672'
-   ```
+## Way 1: Running both RabbitMQ & Consumer using Docker
 
-4. Start the RabbitMQ container:
+Set the following env var(s)
 
-   ```sh
-   docker-compose up -d
-   ```
+```
+QUEUE_URL = "amqp://rabbitmq:5672"
+DISCORD_SERVICE_URL = "http://host.docker.internal:<PORT>"
+DISCORD_QUEUE = <ANY_NAME> #Default: "DISCORD_QUEUE"
+```
 
-5. Verify that RabbitMQ is running by accessing the management interface at [http://localhost:15672](http://localhost:15672). The default username and password are both `guest`.
+Run the compose command:
 
-## Setting up Environment Variables
+```sh
+docker-compose up --build
+```
 
-There are total 3 variables required to make this service functional
+## Way 2: Running RabbitMQ with Docker & Consumer manually
 
-1. QUEUE_URL (`amqp://<HOST_NAME>:<PORT>`)
-   The value of HOST_NAME depends on how you're running the project.
+### Running only RabbitMQ with Docker
 
-- If you're using `docker-compose` for both the queue and consumer, and assuming the queue's container is named `rabbitmq`, set `HOST_NAME` to `rabbitmq`.
-- If you're running the consumer without `docker-compose`, then set `HOST_NAME` to `localhost`.
+```bash
+docker compose -f 'docker-compose.yml' up -d --build 'rabbitmq'
+```
 
-2. QUEUE_NAME
-   You can use any name, consider `RDS_QUEUE` for default use case
-3. DISCORD_SERVICE_URL
-   Place URL of Discord Service
+> [!IMPORTANT]
+> To check if the queue is running or not, visit `http://localhost:15672`
 
-## Running the Project Using Go
+### RabbitMQ UI
+
+This is how the UI will look like once you open `http://localhost:15672`
+
+<img width="1127" alt="Image" src="https://github.com/user-attachments/assets/81b67f52-c762-4773-b75d-26e82d558b36" />
+
+> [!IMPORTANT]
+> User "guest" as username and password
+
+### Running Consumer Manually
+
+Set the following env var(s)
+
+```
+QUEUE_URL = "amqp://localhost:5672"
+DISCORD_QUEUE = <ANY_NAME> #Default: "DISCORD_QUEUE"
+DISCORD_SERVICE_URL = "http://localhost:<PORT>"
+```
+
+#### Manual Setup
 
 1. **Install Packages**
 
-   ```bash
+```bash
    go mod download
-   ```
+```
 
 2. **Verify Packages**
    If it's your first time running the project, ensure all dependencies are set up:
@@ -97,7 +109,7 @@ There are total 3 variables required to make this service functional
    air
    ```
 
-## Running the Project Using Make
+#### Running the Project Using Make
 
 You can run the project using the `Makefile`, which provides several commands for various tasks. Below are the steps to run the project:
 
