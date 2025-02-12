@@ -69,7 +69,7 @@ This is how the UI will look like once you open `http://localhost:15672`
 
 <img width="1127" alt="Image" src="https://github.com/user-attachments/assets/81b67f52-c762-4773-b75d-26e82d558b36" />
 
-> [!Credentials]
+> [!IMPORTANT]
 > User "guest" as username and password
 
 ### Running Consumer Manually
